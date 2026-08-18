@@ -4,7 +4,7 @@
 
 [![Python 3.12](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![NumPy](https://img.shields.io/badge/NumPy-Vectorized-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
-[![Pytest](https://img.shields.io/badge/Tests-7%20Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-10%20Passed-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -12,11 +12,12 @@
 <img src="assets/ffnn_architecture_infographic.jpg" alt="FFNN Architecture & Backpropagation Infographic" width="100%" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);"/>
 
 <p align="center">
-  <b>A modular, high-performance, from-scratch implementation of Feedforward Neural Networks (Multi-Layer Perceptrons) in Python.</b><br/>
-  Featuring complete analytical backpropagation, numerical gradient checking, modern optimizers (Adam, RMSprop, Momentum), and in-depth computational complexity analysis.
+  <b>A modular, high-performance, from-scratch implementation of Feedforward Neural Networks (MLPs) & Geoffrey Hinton's Forward-Forward (FF) Algorithm in Python.</b><br/>
+  Featuring analytical backpropagation, local contrastive goodness learning, numerical gradient checking, modern optimizers, and deep computational/neuromorphic hardware complexity analysis.
 </p>
 
-[📚 Full Theoretical & Mathematical Guide](FEEDFORWARD_NEURAL_NETWORK.md) • [🚀 Quickstart](#-quickstart) • [📐 Architecture & Math](#-architecture--mathematical-mechanics) • [⚡ Computational Analysis](#-computational-analysis--the-12-compute-law) • [🧪 Benchmarks](#-empirical-benchmarks)
+[📚 Standard FFNN Guide](FEEDFORWARD_NEURAL_NETWORK.md) • [🧠 Hinton's Forward-Forward Guide](HINTON_FORWARD_FORWARD_COMPARISON.md) • [🚀 Quickstart](#-quickstart) • [⚡ Computational Analysis](#-computational-analysis--the-12-compute-law) • [🧪 Benchmarks](#-empirical-benchmarks)
+
 
 </div>
 
@@ -89,9 +90,34 @@ Every matrix multiplication $(M \times K) \times (K \times N)$ requires $2 \cdot
 
 ---
 
+---
+
+## 🧠 Geoffrey Hinton's Forward-Forward (FF) Algorithm
+
+<div align="center">
+  <img src="assets/hintons_ff_vs_backprop.png" alt="Hinton's FF vs Backpropagation" width="95%" style="border-radius: 8px; margin: 15px 0;"/>
+</div>
+
+This repository includes a from-scratch implementation of **Geoffrey Hinton's Forward-Forward Algorithm** (`src/forward_forward.py`), which replaces the backward pass of backpropagation with **two forward passes**:
+1. **Positive Pass**: Real data + true class label $\to$ Maximize local layer Goodness ($\sum_j h_j^2 > \theta$).
+2. **Negative Pass**: Corrupted data + false class label $\to$ Minimize local layer Goodness ($\sum_j h_j^2 < \theta$).
+
+### Key Advantages of Hinton's Forward-Forward:
+- **Zero Activation Caching Overhead**: Activations are consumed and discarded immediately ($\mathcal{O}(B \cdot H)$ memory vs $\mathcal{O}(L \cdot B \cdot H)$ in backprop).
+- **Biological Plausibility**: Solves the Weight Transport Problem via strictly local Hebbian-like contrastive synaptic plasticity.
+- **Neuromorphic / Analog Friendly**: Enables direct training on ultra-low-power analog memristor crossbar arrays and photonic accelerators without requiring high-power ADC conversion or bidirectional error routing.
+
+<div align="center">
+  <img src="assets/ff_vs_backprop_experiment.png" alt="Empirical Comparison: Hinton FF vs Backprop" width="95%" style="border-radius: 8px; margin: 15px 0;"/>
+</div>
+
+👉 **Read the complete comparison treatise**: [`HINTON_FORWARD_FORWARD_COMPARISON.md`](HINTON_FORWARD_FORWARD_COMPARISON.md)
+
+---
+
 ## 🧪 Empirical Benchmarks
 
-### 1. Non-Linear 3-Arm Spiral Classification
+### 1. Non-Linear 3-Arm Spiral Classification (Standard FFNN)
 Trained a 3-layer network (`2 -> 64 -> 32 -> 3`) using `ReLU`, `Softmax`, and `Adam(lr=0.01)` on a non-linearly separable spiral dataset:
 - **Validation Accuracy**: **`98.89%`**
 - **Validation Loss**: **`0.0263`**
@@ -100,6 +126,11 @@ Trained a 3-layer network (`2 -> 64 -> 32 -> 3`) using `ReLU`, `Softmax`, and `A
   <img src="assets/spiral_decision_boundary.png" alt="Spiral Dataset Decision Boundary and Convergence" width="90%" style="border-radius: 8px; margin: 15px 0;"/>
 </div>
 
+### 2. Multi-Class Pattern Classification (Hinton's FF vs Backpropagation)
+Both architectures trained on identical 4-class harmonic signal datasets (`examples/train_hintons_forward_forward.py`):
+- **Hinton's Forward-Forward Network**: **`100.00%`** (Inference via Goodness Accumulation)
+- **Standard Backpropagation MLP**: **`100.00%`** (Inference via Softmax Logits)
+
 ---
 
 ## 🚀 Quickstart
@@ -107,8 +138,8 @@ Trained a 3-layer network (`2 -> 64 -> 32 -> 3`) using `ReLU`, `Softmax`, and `A
 ### 1. Automated Environment Setup
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd feedforward
+git clone https://github.com/dparksports/feedforward-neural-network.git
+cd feedforward-neural-network
 
 # Initialize virtual environment and install dependencies
 bash setup_env.sh
@@ -125,46 +156,14 @@ python -m pytest -v tests/
 
 ### 3. Run Demos & Benchmarks
 ```bash
-# Train on the 3-arm spiral dataset
+# 1. Train Standard FFNN on 3-arm spiral dataset
 python examples/train_spiral.py
 
-# Run computational FLOPs and latency profiler
+# 2. Train Hinton's Forward-Forward Network vs Backprop Baseline
+python examples/train_hintons_forward_forward.py
+
+# 3. Run computational FLOPs and latency profiler
 python examples/benchmark.py
-```
-
----
-
-## 💻 Minimal Working Example
-
-```python
-import numpy as np
-from src.network import NeuralNetwork
-from src.layers import Dense
-from src.activations import ReLU, Sigmoid
-from src.losses import BinaryCrossEntropyLoss
-from src.optimizers import Adam
-
-# 1. Non-linear XOR Problem
-X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y = np.array([[0], [1], [1], [0]])
-
-# 2. Build Model Architecture
-model = NeuralNetwork([
-    Dense(in_features=2, out_features=8, init_method="he"),
-    ReLU(),
-    Dense(in_features=8, out_features=1, init_method="xavier"),
-    Sigmoid()
-])
-
-# 3. Train with Adam Optimizer
-optimizer = Adam(lr=0.05)
-loss_fn = BinaryCrossEntropyLoss()
-
-model.fit(X, y, epochs=300, batch_size=4, optimizer=optimizer, loss_fn=loss_fn, verbose=True)
-
-# 4. Predict
-predictions = model.predict_classes(X)
-print("Predictions:\n", predictions)
 ```
 
 ---
@@ -173,30 +172,38 @@ print("Predictions:\n", predictions)
 
 ```
 feedforward/
-├── .gitignore                      # Git ignore file
-├── requirements.txt                # Python dependencies (NumPy, Matplotlib, Pytest)
-├── setup_env.sh                    # Automated venv bootstrap script
-├── FEEDFORWARD_NEURAL_NETWORK.md   # Comprehensive theoretical treatise
-├── README.md                       # Main visual overview & quickstart
-├── assets/                         # Infographics and architecture diagrams
+├── .gitignore                          # Git ignore rules
+├── LICENSE                             # MIT License
+├── requirements.txt                    # Minimal dependencies (NumPy, Matplotlib, Pytest)
+├── setup_env.sh                        # Automated venv initialization
+├── FEEDFORWARD_NEURAL_NETWORK.md       # Full mathematical & computational treatise
+├── HINTON_FORWARD_FORWARD_COMPARISON.md# Comprehensive comparison with Hinton's FF
+├── README.md                           # Main visual overview & quickstart
+├── assets/                             # Generated scientific infographics
 │   ├── ffnn_architecture_infographic.jpg
 │   ├── activations_infographic.png
 │   ├── computational_profile.png
+│   ├── hintons_ff_vs_backprop.png
+│   ├── ff_vs_backprop_experiment.png
 │   └── spiral_decision_boundary.png
-├── src/                            # Modular FFNN Core Package
+├── src/                                # Modular Engine
 │   ├── __init__.py
-│   ├── activations.py              # ReLU, LeakyReLU, Sigmoid, Tanh, Softmax
-│   ├── losses.py                   # MSE, Binary Cross-Entropy, Categorical Cross-Entropy
-│   ├── layers.py                   # Dense Layer (He/Xavier init, gradient cache)
-│   ├── optimizers.py               # SGD, Momentum, RMSprop, Adam
-│   ├── network.py                  # NeuralNetwork sequential container
-│   └── grad_check.py               # Finite-difference gradient checker
+│   ├── activations.py                  # ReLU, LeakyReLU, Sigmoid, Tanh, Softmax
+│   ├── losses.py                       # MSE, Binary Cross-Entropy, Categorical Cross-Entropy
+│   ├── layers.py                       # Dense Layer (He/Xavier init, gradient caching)
+│   ├── optimizers.py                   # SGD, Momentum, RMSprop, Adam
+│   ├── network.py                      # Sequential container & mini-batch loops
+│   ├── grad_check.py                   # Finite-difference gradient checker
+│   └── forward_forward.py              # Geoffrey Hinton's Forward-Forward implementation
 ├── examples/
-│   ├── train_spiral.py             # Spiral classification training script
-│   └── benchmark.py                # FLOPs and latency profiler
+│   ├── train_spiral.py                 # Spiral dataset training demonstration
+│   ├── train_hintons_forward_forward.py# Hinton's FF vs Backpropagation experiment
+│   └── benchmark.py                    # FLOPs and Forward vs Backward latency profiler
 └── tests/
-    └── test_ffnn.py                # 7 Pytest unit & integration test cases
+    ├── test_ffnn.py                    # Standard FFNN unit & integration tests (7 tests)
+    └── test_forward_forward.py         # Hinton's FF unit & convergence tests (3 tests)
 ```
+
 
 ---
 

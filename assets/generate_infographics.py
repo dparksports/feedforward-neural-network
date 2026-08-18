@@ -98,6 +98,73 @@ def generate_compute_profile_plot():
     print(f"Generated {out_path}")
 
 
+# 3. Generate Hinton FF vs Backprop Architectural Comparison Infographic
+def generate_ff_comparison_diagram():
+    plt.style.use("dark_background")
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5), facecolor="#0f172a")
+
+    # Left: Standard Backprop Pipeline
+    ax1.set_facecolor("#1e293b")
+    ax1.set_xlim(0, 10)
+    ax1.set_ylim(0, 10)
+    ax1.axis("off")
+    ax1.set_title("Standard Backpropagation (BP)", fontsize=16, color="#38bdf8", weight="bold", pad=15)
+
+    # Boxes for Backprop
+    box_props = dict(boxstyle="round,pad=0.5", facecolor="#0f172a", edgecolor="#0284c7", linewidth=1.5)
+    ax1.text(5, 8.5, "Input: X", ha="center", va="center", color="#f8fafc", fontsize=12, bbox=box_props)
+    ax1.text(5, 6.5, "Layer 1: Z^[1] = XW1 + b1\n[Must cache A^[1] in RAM]", ha="center", va="center", color="#f8fafc", fontsize=10, bbox=box_props)
+    ax1.text(5, 4.5, "Layer 2: Z^[2] = A^[1]W2 + b2\n[Must cache A^[2] in RAM]", ha="center", va="center", color="#f8fafc", fontsize=10, bbox=box_props)
+    ax1.text(5, 2.5, "Output Loss: L(y, y_pred)\n[Global Scalar Objective]", ha="center", va="center", color="#f43f5e", fontsize=11, bbox=dict(boxstyle="round,pad=0.5", facecolor="#0f172a", edgecolor="#e11d48", linewidth=1.5))
+
+    # Arrows for Forward
+    ax1.annotate("", xy=(5, 7.3), xytext=(5, 8.0), arrowprops=dict(arrowstyle="->", color="#38bdf8", lw=2.5))
+    ax1.annotate("", xy=(5, 5.3), xytext=(5, 6.0), arrowprops=dict(arrowstyle="->", color="#38bdf8", lw=2.5))
+    ax1.annotate("", xy=(5, 3.3), xytext=(5, 4.0), arrowprops=dict(arrowstyle="->", color="#38bdf8", lw=2.5))
+    ax1.text(3.5, 5.7, "Forward Pass\n(Activations)", color="#38bdf8", fontsize=10, ha="right")
+
+    # Arrows for Backward
+    ax1.annotate("", xy=(6.5, 4.0), xytext=(6.5, 3.3), arrowprops=dict(arrowstyle="->", color="#f43f5e", lw=2.5, linestyle="--"))
+    ax1.annotate("", xy=(6.5, 6.0), xytext=(6.5, 5.3), arrowprops=dict(arrowstyle="->", color="#f43f5e", lw=2.5, linestyle="--"))
+    ax1.text(6.8, 4.7, "Reverse Chain Rule\n(δ Error Gradient)", color="#f43f5e", fontsize=10, ha="left")
+
+    ax1.text(5, 0.8, "• Global Loss Synchronized\n• Requires Activation Caching O(L·B·H)\n• Biologically Implausible (Weight Transport)", ha="center", va="center", color="#cbd5e1", fontsize=10, style="italic")
+
+    # Right: Hinton's Forward-Forward Pipeline
+    ax2.set_facecolor("#1e293b")
+    ax2.set_xlim(0, 10)
+    ax2.set_ylim(0, 10)
+    ax2.axis("off")
+    ax2.set_title("Geoffrey Hinton's Forward-Forward (FF)", fontsize=16, color="#a855f7", weight="bold", pad=15)
+
+    ff_box_pos = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#10b981", linewidth=1.5)
+    ff_box_neg = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#ef4444", linewidth=1.5)
+    ff_box_layer = dict(boxstyle="round,pad=0.5", facecolor="#0f172a", edgecolor="#9333ea", linewidth=1.5)
+
+    ax2.text(3, 8.5, "Pos Pass (x, y_true)\n[Real Data]", ha="center", va="center", color="#10b981", fontsize=10, bbox=ff_box_pos)
+    ax2.text(7, 8.5, "Neg Pass (x, y_false)\n[Corrupted Data]", ha="center", va="center", color="#ef4444", fontsize=10, bbox=ff_box_neg)
+
+    ax2.text(5, 6.2, "Layer 1: Local Contrastive Loss\nMaximize G_pos = ∑(h_pos)^2 > θ\nMinimize G_neg = ∑(h_neg)^2 < θ\n[Normalize h / ||h||2 -> Layer 2]", ha="center", va="center", color="#f8fafc", fontsize=10, bbox=ff_box_layer)
+    ax2.text(5, 3.2, "Layer 2: Local Contrastive Loss\nMaximize G_pos = ∑(h_pos)^2 > θ\nMinimize G_neg = ∑(h_neg)^2 < θ\n[Independent Greedy Updates]", ha="center", va="center", color="#f8fafc", fontsize=10, bbox=ff_box_layer)
+
+    # Arrows for FF
+    ax2.annotate("", xy=(3.5, 7.3), xytext=(3.0, 8.0), arrowprops=dict(arrowstyle="->", color="#10b981", lw=2))
+    ax2.annotate("", xy=(6.5, 7.3), xytext=(7.0, 8.0), arrowprops=dict(arrowstyle="->", color="#ef4444", lw=2))
+    ax2.annotate("", xy=(5, 4.3), xytext=(5, 5.1), arrowprops=dict(arrowstyle="->", color="#a855f7", lw=2.5))
+    ax2.text(5.5, 4.7, "Normalized h / ||h||", color="#a855f7", fontsize=9)
+
+    ax2.text(5, 0.8, "• Zero Backward Pass (Two Forward Passes)\n• Layer-Local Learning (No Error Propagation)\n• Neuromorphic / Analog Friendly", ha="center", va="center", color="#cbd5e1", fontsize=10, style="italic")
+
+    plt.suptitle("Architectural Comparison: Backpropagation vs. Hinton's Forward-Forward", fontsize=17, color="#f8fafc", weight="bold", y=0.98)
+    plt.tight_layout()
+    out_path = "assets/hintons_ff_vs_backprop.png"
+    plt.savefig(out_path, dpi=200, facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close()
+    print(f"Generated {out_path}")
+
+
 if __name__ == "__main__":
     generate_activations_plot()
     generate_compute_profile_plot()
+    generate_ff_comparison_diagram()
+

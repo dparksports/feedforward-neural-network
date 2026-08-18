@@ -8,6 +8,7 @@ from .layers import Dense
 from .optimizers import SGD, RMSprop, Adam
 from .network import NeuralNetwork
 from .grad_check import gradient_check
+from .forward_forward import FFLayer, FFNetwork
 
 __all__ = [
     "ReLU",
@@ -24,4 +25,7 @@ __all__ = [
     "Adam",
     "NeuralNetwork",
     "gradient_check",
+    "FFLayer",
+    "FFNetwork",
 ]
+
