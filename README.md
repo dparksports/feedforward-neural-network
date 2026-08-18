@@ -16,7 +16,7 @@
   Featuring analytical backpropagation, local contrastive goodness learning, numerical gradient checking, modern optimizers, and deep computational/neuromorphic hardware complexity analysis.
 </p>
 
-[📚 Standard FFNN Guide](FEEDFORWARD_NEURAL_NETWORK.md) • [🧠 Hinton's Forward-Forward Guide](HINTON_FORWARD_FORWARD_COMPARISON.md) • [🚀 Quickstart](#-quickstart) • [⚡ Computational Analysis](#-computational-analysis--the-12-compute-law) • [🧪 Benchmarks](#-empirical-benchmarks)
+[📚 Standard FFNN Guide](FEEDFORWARD_NEURAL_NETWORK.md) • [🧠 Hinton's Forward-Forward Guide](HINTON_FORWARD_FORWARD_COMPARISON.md) • [🧬 Biological Recursion vs FF Guide](BIOLOGICAL_RECURSIVE_FEED_VS_FORWARD_FORWARD.md) • [🚀 Quickstart](#-quickstart) • [🧪 Benchmarks](#-empirical-benchmarks)
 
 
 </div>
@@ -168,41 +168,66 @@ python examples/benchmark.py
 
 ---
 
+---
+
+## 🧬 Biological Cortical Recursion vs. Forward-Forward
+
+<div align="center">
+  <img src="assets/biological_recurrent_vs_ff.png" alt="Biological Recursion vs Hinton's FF" width="98%" style="border-radius: 8px; margin: 15px 0;"/>
+</div>
+
+How does the mammalian neocortex perform representation learning without global backpropagation?
+- **10:1 Top-Down Feedback Ratio**: In the cortex, top-down modulatory connections outnumber bottom-up feedforward connections by ~10 to 1.
+- **Two-Compartment Pyramidal Neurons**: Basal dendrites receive sensory input (L4), while apical dendrites receive top-down contextual predictions (L1). BAC calcium bursting computes **local dendritic credit assignment**.
+- **Predictive Coding (Rao & Ballard / Friston)**: Top-down feedback transmits predictions ($\mu$), while feedforward pathways transmit residual errors ($\boldsymbol{\epsilon} = \mathbf{r} - \mu$), settling via continuous-time dynamical attractor equations.
+
+<div align="center">
+  <img src="assets/biological_pc_simulation.png" alt="Biological Predictive Coding Continuous Attractor Settling" width="95%" style="border-radius: 8px; margin: 15px 0;"/>
+</div>
+
+👉 **Read the comprehensive neurobiology & algorithmic treatise**: [`BIOLOGICAL_RECURSIVE_FEED_VS_FORWARD_FORWARD.md`](BIOLOGICAL_RECURSIVE_FEED_VS_FORWARD_FORWARD.md)
+
+---
+
 ## 📁 Repository Structure
 
 ```
 feedforward/
-├── .gitignore                          # Git ignore rules
-├── LICENSE                             # MIT License
-├── requirements.txt                    # Minimal dependencies (NumPy, Matplotlib, Pytest)
-├── setup_env.sh                        # Automated venv initialization
-├── FEEDFORWARD_NEURAL_NETWORK.md       # Full mathematical & computational treatise
-├── HINTON_FORWARD_FORWARD_COMPARISON.md# Comprehensive comparison with Hinton's FF
-├── README.md                           # Main visual overview & quickstart
-├── assets/                             # Generated scientific infographics
+├── .gitignore                              # Git ignore rules
+├── LICENSE                                 # MIT License
+├── requirements.txt                        # Minimal dependencies (NumPy, Matplotlib, Pytest)
+├── setup_env.sh                            # Automated venv initialization
+├── FEEDFORWARD_NEURAL_NETWORK.md           # Full mathematical & computational treatise
+├── HINTON_FORWARD_FORWARD_COMPARISON.md    # Comprehensive comparison with Hinton's FF
+├── BIOLOGICAL_RECURSIVE_FEED_VS_FORWARD_FORWARD.md # Biological recursion & predictive coding treatise
+├── README.md                               # Main visual overview & quickstart
+├── assets/                                 # Generated scientific infographics
 │   ├── ffnn_architecture_infographic.jpg
 │   ├── activations_infographic.png
 │   ├── computational_profile.png
 │   ├── hintons_ff_vs_backprop.png
 │   ├── ff_vs_backprop_experiment.png
-│   └── spiral_decision_boundary.png
-├── src/                                # Modular Engine
+│   ├── biological_recurrent_vs_ff.png
+│   └── biological_pc_simulation.png
+├── src/                                    # Modular Engine
 │   ├── __init__.py
-│   ├── activations.py                  # ReLU, LeakyReLU, Sigmoid, Tanh, Softmax
-│   ├── losses.py                       # MSE, Binary Cross-Entropy, Categorical Cross-Entropy
-│   ├── layers.py                       # Dense Layer (He/Xavier init, gradient caching)
-│   ├── optimizers.py                   # SGD, Momentum, RMSprop, Adam
-│   ├── network.py                      # Sequential container & mini-batch loops
-│   ├── grad_check.py                   # Finite-difference gradient checker
-│   └── forward_forward.py              # Geoffrey Hinton's Forward-Forward implementation
+│   ├── activations.py                      # ReLU, LeakyReLU, Sigmoid, Tanh, Softmax
+│   ├── losses.py                           # MSE, Binary Cross-Entropy, Categorical Cross-Entropy
+│   ├── layers.py                           # Dense Layer (He/Xavier init, gradient caching)
+│   ├── optimizers.py                       # SGD, Momentum, RMSprop, Adam
+│   ├── network.py                          # Sequential container & mini-batch loops
+│   ├── grad_check.py                       # Finite-difference gradient checker
+│   └── forward_forward.py                  # Geoffrey Hinton's Forward-Forward implementation
 ├── examples/
-│   ├── train_spiral.py                 # Spiral dataset training demonstration
-│   ├── train_hintons_forward_forward.py# Hinton's FF vs Backpropagation experiment
-│   └── benchmark.py                    # FLOPs and Forward vs Backward latency profiler
+│   ├── train_spiral.py                     # Spiral dataset training demonstration
+│   ├── train_hintons_forward_forward.py    # Hinton's FF vs Backpropagation experiment
+│   ├── biological_predictive_coding_demo.py# Continuous-time cortical predictive coding simulation
+│   └── benchmark.py                        # FLOPs and Forward vs Backward latency profiler
 └── tests/
-    ├── test_ffnn.py                    # Standard FFNN unit & integration tests (7 tests)
-    └── test_forward_forward.py         # Hinton's FF unit & convergence tests (3 tests)
+    ├── test_ffnn.py                        # Standard FFNN unit & integration tests (7 tests)
+    └── test_forward_forward.py             # Hinton's FF unit & convergence tests (3 tests)
 ```
+
 
 
 ---

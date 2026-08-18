@@ -163,8 +163,86 @@ def generate_ff_comparison_diagram():
     print(f"Generated {out_path}")
 
 
+# 4. Generate Biological Recursive Feedback vs Forward-Forward Infographic
+def generate_biological_vs_ff_diagram():
+    plt.style.use("dark_background")
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6.5), facecolor="#0f172a")
+
+    # Panel 1: Biological 2-Compartment Pyramidal Neuron
+    ax1.set_facecolor("#1e293b")
+    ax1.set_xlim(0, 10)
+    ax1.set_ylim(0, 10)
+    ax1.axis("off")
+    ax1.set_title("1. Biological Pyramidal Neuron\n(Two-Compartment Biophysics)", fontsize=13, color="#38bdf8", weight="bold", pad=12)
+
+    box_apical = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#38bdf8", linewidth=1.5)
+    box_soma = dict(boxstyle="circle,pad=0.5", facecolor="#0f172a", edgecolor="#f59e0b", linewidth=1.8)
+    box_basal = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#10b981", linewidth=1.5)
+
+    ax1.text(5, 8.5, "Apical Tuft (Layer 1)\nTop-Down Recursive Feedback\n(Predictions & Context)", ha="center", va="center", color="#38bdf8", fontsize=9, bbox=box_apical)
+    ax1.text(5, 4.8, "Soma\n[BAC Burst\nSpike Engine]", ha="center", va="center", color="#f59e0b", fontsize=9, bbox=box_soma)
+    ax1.text(5, 1.8, "Basal Dendrites (Layer 4)\nBottom-Up Sensory Feedforward\n(Direct Input Drive)", ha="center", va="center", color="#10b981", fontsize=9, bbox=box_basal)
+
+    # Arrows connecting compartments
+    ax1.annotate("", xy=(5, 5.8), xytext=(5, 7.5), arrowprops=dict(arrowstyle="->", color="#38bdf8", lw=2, linestyle=":"))
+    ax1.annotate("", xy=(5, 3.8), xytext=(5, 2.7), arrowprops=dict(arrowstyle="->", color="#10b981", lw=2))
+    ax1.text(5, 0.4, "• Local Ca2+ dendritic plateau spikes\n• 10:1 Top-Down vs Feedforward Ratio\n• Resolves Weight Transport biophysically", ha="center", va="center", color="#cbd5e1", fontsize=8.5, style="italic")
+
+    # Panel 2: Predictive Coding Loops
+    ax2.set_facecolor("#1e293b")
+    ax2.set_xlim(0, 10)
+    ax2.set_ylim(0, 10)
+    ax2.axis("off")
+    ax2.set_title("2. Cortical Predictive Coding\n(Continuous Dynamical Loops)", fontsize=13, color="#ec4899", weight="bold", pad=12)
+
+    box_pred = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#a855f7", linewidth=1.5)
+    box_err = dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#ef4444", linewidth=1.5)
+
+    ax2.text(5, 8.2, "Higher Area Representation\nState: r^[L](t)", ha="center", va="center", color="#a855f7", fontsize=9.5, bbox=box_pred)
+    ax2.text(5, 4.8, "Top-Down Prediction: μ = W_fb • r^[L]\nResidual Error: ε = r^[L-1] - μ", ha="center", va="center", color="#f8fafc", fontsize=9, bbox=box_err)
+    ax2.text(5, 1.8, "Lower Area Sensory Drive\nState: r^[L-1](t)", ha="center", va="center", color="#06b6d4", fontsize=9.5, bbox=dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#06b6d4", linewidth=1.5))
+
+    ax2.annotate("", xy=(4.2, 5.8), xytext=(4.2, 7.3), arrowprops=dict(arrowstyle="->", color="#a855f7", lw=2))
+    ax2.text(3.5, 6.6, "Prediction\n(Top-Down)", color="#a855f7", fontsize=8, ha="right")
+    ax2.annotate("", xy=(5.8, 7.3), xytext=(5.8, 5.8), arrowprops=dict(arrowstyle="->", color="#ef4444", lw=2, linestyle="--"))
+    ax2.text(6.5, 6.6, "Residual Error ε\n(Bottom-Up)", color="#ef4444", fontsize=8, ha="left")
+
+    ax2.text(5, 0.4, "• dr/dt = -ε + W_ff^T ε (Continuous settling)\n• ΔW ∝ ε • r^T (Local Hebbian update)\n• Minimizes Variational Free Energy", ha="center", va="center", color="#cbd5e1", fontsize=8.5, style="italic")
+
+    # Panel 3: Hinton's Forward-Forward Paradigm
+    ax3.set_facecolor("#1e293b")
+    ax3.set_xlim(0, 10)
+    ax3.set_ylim(0, 10)
+    ax3.axis("off")
+    ax3.set_title("3. Hinton's Forward-Forward\n(Contrastive Goodness Passes)", fontsize=13, color="#10b981", weight="bold", pad=12)
+
+    box_ff_pos = dict(boxstyle="round,pad=0.35", facecolor="#0f172a", edgecolor="#10b981", linewidth=1.5)
+    box_ff_neg = dict(boxstyle="round,pad=0.35", facecolor="#0f172a", edgecolor="#ef4444", linewidth=1.5)
+
+    ax3.text(3, 8.2, "Positive Pass\n(Real Data: G > θ)\n[Wake / Sensory]", ha="center", va="center", color="#10b981", fontsize=8.5, bbox=box_ff_pos)
+    ax3.text(7, 8.2, "Negative Pass\n(Corrupt: G < θ)\n[Sleep / Dream]", ha="center", va="center", color="#ef4444", fontsize=8.5, bbox=box_ff_neg)
+
+    ax3.text(5, 4.8, "Layer-Local Contrastive Plasticity\nG(h) = ∑ h_j^2 (Goodness)\nLocal Update: ∇_W = X^T (dL/dz)", ha="center", va="center", color="#f8fafc", fontsize=9, bbox=dict(boxstyle="round,pad=0.5", facecolor="#0f172a", edgecolor="#9333ea", linewidth=1.5))
+    ax3.text(5, 1.8, "Normalized Activity Output\nh_norm = h / ||h||_2\nPassed forward to Layer l+1", ha="center", va="center", color="#f8fafc", fontsize=9, bbox=dict(boxstyle="round,pad=0.4", facecolor="#0f172a", edgecolor="#6366f1", linewidth=1.5))
+
+    ax3.annotate("", xy=(3.5, 6.0), xytext=(3.0, 7.3), arrowprops=dict(arrowstyle="->", color="#10b981", lw=2))
+    ax3.annotate("", xy=(6.5, 6.0), xytext=(7.0, 7.3), arrowprops=dict(arrowstyle="->", color="#ef4444", lw=2))
+    ax3.annotate("", xy=(5, 2.7), xytext=(5, 3.8), arrowprops=dict(arrowstyle="->", color="#9333ea", lw=2))
+
+    ax3.text(5, 0.4, "• Forward-only contrastive learning\n• Zero activation memory caching in RAM\n• Solves Weight Transport without backprop", ha="center", va="center", color="#cbd5e1", fontsize=8.5, style="italic")
+
+    plt.suptitle("Comparative Synthesis: Biological Cortical Recursion vs. Hinton's Forward-Forward", fontsize=16, color="#f8fafc", weight="bold", y=0.98)
+    plt.tight_layout()
+    out_path = "assets/biological_recurrent_vs_ff.png"
+    plt.savefig(out_path, dpi=200, facecolor=fig.get_facecolor(), edgecolor='none')
+    plt.close()
+    print(f"Generated {out_path}")
+
+
 if __name__ == "__main__":
     generate_activations_plot()
     generate_compute_profile_plot()
     generate_ff_comparison_diagram()
+    generate_biological_vs_ff_diagram()
+
 
